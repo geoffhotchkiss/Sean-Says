@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <title>Sean Says...</title>
+    <script src="base64.js"></script>
+    <script src="canvas2image.js"></script>
+    <script src="seansays.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <script type="text/JavaScript">
+    function saveimage() {
+      var thecanvas = document.getElementById("seansayscanvas");
+      Canvas2Image.saveAsPNG(thecanvas);
+    }
+
+    function upload() {
+      var canvas = document.getElementById("seansayscanvas");
+      try {
+        var img = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+      } catch(e) {
+        var img = canvas.toDataURL().split(',')[1];
+      }
+      var w = window.open();
+      w.document.write('Uploading...');
+      $.ajax({
+        url: 'http://api.imgur.com/2/upload.json',
+        type: 'POST',
+        data: {
+          type: 'base64',
+          key: '22956e246d458caf43e6bba8d72dc8d6',
+          name: 'seansays.jpg',
+          title: 'Sean says...',
+          caption: 'test caption',
+          image: img
+        },
+        dataType: 'json'
+      }).success(function(data) {
+        w.location.href = data['upload']['links']['imgur_page'];
+      }).error(function() {
+        alert('Count not reach api.imgur.com');
+        w.close();
+      });
+    }
+    </script>
+  </head>
+
+  <body onload="draw();">
+    <canvas id="seansayscanvas" width="800" height="533">
+      <img src="seansays-small.jpg" alt="Sean says you don't have canvas support!">
+    </canvas>
+
+    <p>
+      <input type="submit" value="Sean says..." onclick="draw();"/> <input name="whatseansays" id="whatseansays" type="text"/>
+    </p>
+
+    <p>
+      <input type="submit" value="Save as PNG" onclick="saveimage();"/>
+      <input type="submit" value="Upload to imgur" onclick="upload();"/>
+      <a href="https://twitter.com/share" 
+        class="twitter-share-button"
+        data-text="@seanmcgary says..."
+        data-url="nada">Tweet</a>
+    </p>
+  </body>
+</html>
